@@ -3,22 +3,23 @@ const inputEl = document.getElementById("input-el")
 const inputBtn = document.getElementById("input-btn")
 const ulEl = document.getElementById("ul-el")
 const deleteBtn = document.getElementById("delete-btn")
+const tabBtn = document.getElementById("tab-btn")
 
 const leadsFromLocalStorage = JSON.parse(localStorage.getItem("myLeads"))
 
 if (leadsFromLocalStorage) {
     myLeads = leadsFromLocalStorage
-    renderLeads()
+    render(myLeads)
 }
 
-function renderLeads(){
+function render(leads){
     let listItems = "" //using listTems to first have all element and then as loop executes manupulate dom at end because DOM Manupulation inside loop cost us higher
-    for (let i = 0; i < myLeads.length; i++) {
+    for (let i = 0; i < leads.length; i++) {
     // listItems += "<li><a href=" + myLeads[i] + ">" + myLeads[i] + "</a></li>"
     listItems += `
         <li>
-            <a href= ${myLeads[i]} >
-                ${myLeads[i]} 
+            <a href= ${leads[i]} >
+                ${leads[i]} 
             </a>
         </li>
     `
@@ -32,15 +33,23 @@ function renderLeads(){
 ulEl.innerHTML = listItems
 }
 
+tabBtn.addEventListener("click", function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+        myLeads.push(tabs[0].url)
+        localStorage.setItem("myLeads", JSON.stringify(myLeads) )
+        render(myLeads)
+    })
+})
+
 deleteBtn.addEventListener("dblclick", function() {
     myLeads = []
-    localStorage.clear
-    renderLeads()
+    localStorage.clear()
+    render(myLeads)
 })
 
 inputBtn.addEventListener("click", function() {
     myLeads.push(inputEl.value)
     inputEl.value = ""
     localStorage.setItem("myLeads", JSON.stringify(myLeads) )
-    renderLeads()
+    render(myLeads)
 })
